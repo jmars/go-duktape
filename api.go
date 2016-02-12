@@ -439,8 +439,14 @@ func (d *Context) GetBoolean(index int) bool {
 }
 
 // See: http://duktape.org/api.html#duk_get_buffer
-func (d *Context) GetBuffer(index int, outSize int) {
-	C.duk_get_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(&outSize)))
+func (d *Context) GetBuffer(index int, outSize *int) []byte {
+	__cbuf__ := C.duk_get_buffer(d.duk_context, C.duk_idx_t(index), (*C.duk_size_t)(unsafe.Pointer(outSize)))
+  bufc := (*[1<<30]byte)(__cbuf__)
+  buf := make([]byte, *outSize)
+  for i := range buf {
+    buf[i] = bufc[i]
+  }
+  return buf
 }
 
 // See: http://duktape.org/api.html#duk_get_context
